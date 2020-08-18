@@ -20,8 +20,8 @@ end receiver;
 
 ---------------------------------------------------------- 
 
-architecture rx of receiver is --FSM 
-	states type state_type is (EDO_1, EDO_2); 
+architecture rx of receiver is --FSM states 
+	type state_type is (EDO_1, EDO_2); 
 	signal presentstate: state_type:=EDO_1; --estado presente 
 	signal nextstate: state_type; --estado futuro 
 
