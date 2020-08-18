@@ -1,0 +1,46 @@
+--ejemplo de uso del módulo bluetooth HC06 como receptor 
+--conectado a la tarjeta Nexys2, usando protocolo RS-232 y 
+--una aplicación de celular comercial que envía código ASCII. 
+
+------------------------------------------------------------------------------------------ 
+
+
+library ieee; 
+use ieee.std_logic_1164.all; 
+use ieee.std_logic_arith.all; 
+use ieee.std_logic_unsigned.all; 
+
+---------------------------------------------------------- 
+
+entity receiver is port( clk: in std_logic; --50MHz 
+			 reset: in std_logic; --reset 
+			 rx: in std_logic; --entrada de datos del modulo bluetooth (a DO) 
+			 leds: out std_logic_vector(7 downto 0) --salida a leds ); 
+end receiver; 
+
+---------------------------------------------------------- 
+
+architecture rx of receiver is --FSM 
+	states type state_type is (EDO_1, EDO_2); 
+	signal presentstate: state_type:=EDO_1; --estado presente 
+	signal nextstate: state_type; --estado futuro 
+
+--señales
+----------------------------- 
+signal control: std_logic:='0'; --indica cuando ocurre el bit de start 
+signal done: std_logic:='0'; --indica cuando termina la recepción de datos 
+signal tmp: std_logic_vector(8 downto 0):="000000000"; --registro de datos 
+
+--contadores para los retardos
+----------------------------- 
+--signal i: std_logic_vector(3 downto 0):="0000"; 
+
+--contador de los bits recibidos 
+signal c: std_logic_vector(9 downto 0):="1111111111"; 
+--contador de retardos(868) 
+signal delay: std_logic:='0'; 
+-- reloj de C2 
+signal c2: std_logic_vector(1 downto 0):="11"; 
+--contador de muestreo 
+signal capture: std_logic:='0'; 
+--reloj de captura
