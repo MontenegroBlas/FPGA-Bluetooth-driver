@@ -40,7 +40,72 @@ signal c: std_logic_vector(9 downto 0):="1111111111";
 --contador de retardos(868) 
 signal delay: std_logic:='0'; 
 -- reloj de C2 
-signal c2: std_logic_vector(1 downto 0):="11"; 
+signal c2: std_logic_vector(1 downto 0):="11";  
 --contador de muestreo 
-signal capture: std_logic:='0'; 
+signal capture: std_logic:='0';  
 --reloj de captura
+
+
+begin 
+
+----------------------------- ok delay 
+--proceso de retardor al triple de la frecuencia 
+
+process (clk) 
+begin 
+	if clk'event and clk='1' then 
+		if c <"1101100100" then 
+			c <= c + '1'; --868 
+		else 
+			c <= (others=>'0'); 
+			delay <= not delay; 
+		end if; 
+	end if; 
+end process; 
+
+----------------------------- ok c2 
+
+--proceso para el contador C2 para la captura 
+
+process (delay) 
+begin 
+	if delay'event and delay='1' then 
+		if c2 > "01" then 
+			c2 <= "00"; -- 
+		else 
+			c2 <= c2 + '1'; 
+		end if; 
+	end if; 
+end process; 
+
+----------------------------- ok capture 
+
+--proceso para capturar en el bit de en medio (capture) 
+
+process (c2) 
+begin 
+	if c2 = "01" then 
+		capture <= '1'; -- 
+	else 
+		capture <= '0'; -- 
+	end if; 
+end process; 
+
+----------------------------- ok fsm 
+
+--FSM 
+
+process (reset,capture) 
+begin 
+	if capture'event and capture='1' then 
+		if reset='1' then 
+			presentstate <= EDO_1; 
+		else 
+			presentstate <= nextstate; 
+		end if; 
+	end if; 
+end process; 
+
+----------------------------- ok fsm 
+
+process (presentstate, rx, done)
